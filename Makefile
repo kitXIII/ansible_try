@@ -6,11 +6,14 @@ uptime:
 
 # to check wihtout running
 check-playbook:
-	ansible-playbook --check playbook_git.yml -i inventory.ini
+	ansible-playbook --check playbook.yml -i inventory.ini
 
 # we use here -t tag, also we can use  --skip-tags someTag
-install-git:
-	ansible-playbook playbook_git.yml -i inventory.ini -t install
+install:
+	ansible-playbook playbook.yml -i inventory.ini -t install
 
-uninstall-git:
-	ansible-playbook playbook_git.yml -i inventory.ini -t uninstall
+install-node:
+	ansible-playbook playbook.yml -i inventory.ini -t install-node
+
+uninstall-node:
+	ansible-playbook playbook.yml -i inventory.ini -t uninstall-node
