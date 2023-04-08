@@ -1,0 +1,12 @@
+events {
+
+}
+
+http {
+  server {
+    listen {{ nginx_port }};
+    location / {
+        root {{ root_dir }};
+    }
+  }
+}
