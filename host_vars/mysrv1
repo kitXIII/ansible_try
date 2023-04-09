@@ -1,0 +1,2 @@
+ansible_ssh_host: 161.35.28.162
+server_name: MySrv 1 (app)

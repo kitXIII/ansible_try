@@ -1,7 +1,7 @@
-- hosts: webservers
+- hosts: servers
 
   vars:
-    nginx_port: 8080
+    nginx_port: 80
     root_dir: /var/tmp/www
 
   tasks:
@@ -20,8 +20,8 @@
       tags: [install, update-content]
 
     - name: set or update content
-      ansible.builtin.copy:
-        src: files/index.html
+      ansible.builtin.template:
+        src: templates/index.html.j2
         dest: "{{ root_dir }}/index.html"
       become: yes
       tags: [install, update-content]

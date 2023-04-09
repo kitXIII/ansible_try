@@ -1,0 +1,3 @@
+ansible_ssh_host: 164.90.224.75
+
+server_name: MySrv 2 (web)
