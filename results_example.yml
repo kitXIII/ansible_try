@@ -1,0 +1,31 @@
+- hosts: all
+  gather_facts: no
+  tasks:
+    # EXAMPLE 1
+    - ansible.builtin.shell: ls /Users
+      # регистрация переменной для сохранения результата тек таски ( те выполнения ls /Users )
+      register: home_dirs
+    - name: add home dirs to cron
+      ansible.builtin.cron:
+        name: "backup_dirs"
+        minute: "0"
+        hour: "5,2"
+        job: "backup /home/{{ item }}"
+      # использование результата
+      with_items: home_dirs.stdout_lines
+    - ansible.builtin.debug:
+        # использование результата
+        var: home_dirs.stdout_lines
+
+    # EXAMPLE 2
+    # вернет ненульевой результат выполнения что эквивалентно ошибке
+    - ansible.builtin.command: 'false'
+      register: result
+      # подавление ошибки
+      ignore_errors: yes
+    - ansible.builtin.command: echo 'ehu'
+      when: not result.failed
+      # when: result | success
+    - ansible.builtin.command: uptime
+      when: result.failed
+      # when: result | failed

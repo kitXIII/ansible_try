@@ -9,6 +9,7 @@
 <body>
   <h1>Hello from ansible!</h1>
   <h2>{{ dyn_server_name }}</h2>
-  <p>Last update: {{ '%d-%m-%Y' | strftime(ansible_date_time.epoch) }}</p>
+  <pre><code>{{ cowsay_result.stdout }}</code></pre>
+  <small>Deployed at: {{ '%d-%m-%Y' | strftime(ansible_date_time.epoch) }}</small>
 </body>
 </html>

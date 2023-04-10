@@ -4,21 +4,32 @@
   vars:
     nginx_port: 80
     root_dir: /var/tmp/www
-    dyn_server_name: "This is server {{ ansible_hostname | upper }} based on {{ ansible_distribution | upper }}!"
+    dyn_server_name: "This is server {{ ansible_hostname | upper }}!"
 
   tasks:
     - name: install nginx
       ansible.builtin.apt:
-        name: nginx
+        name:
+          - nginx
+          - cowsay
         state: latest
       become: yes
       tags: install
 
     - name: create the root dir if it does not exist
-      file:
+      ansible.builtin.file:
         path: "{{ root_dir }}"
         state: directory
         mode: '0777'
+      tags: [install, update-content]
+
+    - name: run cowsay
+      ansible.builtin.command: "cowsay {{ dyn_server_name }}"
+      register: cowsay_result
+      tags: [install, update-content]
+
+    - ansible.builtin.debug:
+        var: cowsay_result.stdout_lines
       tags: [install, update-content]
 
     - name: set or update content
