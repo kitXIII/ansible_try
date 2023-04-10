@@ -5,70 +5,33 @@
       - jaime
       - sansa
       - robert
+      - arya
     admin_group: admin
 
   tasks:
-    - name: Apt update
-      ansible.builtin.apt:
-        update_cache: yes
+    - ansible.builtin.import_tasks: tasks-install-common.yml
       tags: install
 
-    - name: Install common deps
-      ansible.builtin.apt:
-        name:
-          - git
-          - make
-          - gcc
-          - g++
-        state: present
-      tags: install
-
-    - name: Add nodejs apt key
-      ansible.builtin.apt_key:
-        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
-        state: present
+    - ansible.builtin.import_tasks: tasks-install-node.yml
       tags: [install, install-node]
 
-    - name: Add nodejs 18.x ppa for apt repo
-      ansible.builtin.apt_repository:
-        repo: deb https://deb.nodesource.com/node_18.x focal main
-        update_cache: yes
-      tags: [install, install-node]
-
-    # https://askubuntu.com/questions/1414803/im-getting-errors-that-i-dont-understand-installing-nodejs-on-a-freshly-instal
-    - name: Remove dependencies that are no longer required
-      ansible.builtin.apt:
-        autoremove: yes
-      tags: [install, install-node]
-
-    - name: Install node
-      ansible.builtin.apt:
-        update_cache: yes
-        name: nodejs
-        state: present
-      tags: [install, install-node]
-
-    # apt-get remove node
-    - name: Remove node
-      ansible.builtin.apt:
-        name: nodejs
-        state: absent
+    - ansible.builtin.import_tasks: tasks-uninstall-node.yml
       tags: uninstall-node
 
     - name: Add users
       ansible.builtin.user:
         name: "{{ item }}"
         groups: "{{ admin_group }}"
-      with_items: "{{ users }}"
-      tags: install
+      loop: "{{ users }}"
+      tags: [install, setup-users]
 
     - name: Add users ssh keys
       ansible.posix.authorized_key:
         user: "{{ item }}"
         state: present
-        key: "{{ lookup('ansible.builtin.file', './files/id_rsa.pub') }}"
-      with_items: "{{ users }}"
-      tags: install
+        key: "{{ lookup('ansible.builtin.file', './files/id_do_rsa.pub') }}"
+      loop: "{{ users }}"
+      tags: [install, setup-users]
 
     - name: Add users to sudoeers and validate
       ansible.builtin.lineinfile:
@@ -82,7 +45,9 @@
     - name: Add gitconfig for users
       ansible.builtin.template:
         src: templates/gitconfig.j2
-        dest: '/home/{{ item }}/.gitconfig'
-        owner: '{{ item }}'
-      with_items: "{{ users }}"
-      tags: install
+        dest: '/home/{{ user }}/.gitconfig'
+        owner: '{{ user }}'
+      loop: "{{ users }}"
+      loop_control:
+        loop_var: user
+      tags: [install, setup-users]

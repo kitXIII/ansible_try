@@ -1,0 +1,9 @@
+- name: Install common deps
+  ansible.builtin.apt:
+    name:
+      - git
+      - make
+      - gcc
+      - g++
+    state: present
+    update_cache: yes

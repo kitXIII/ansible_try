@@ -1,0 +1,4 @@
+- name: Remove node
+  ansible.builtin.apt:
+    name: nodejs
+    state: absent
