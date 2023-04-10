@@ -1,9 +1,10 @@
 - hosts: servers
-  gather_facts: no
+  # gather_facts: no
 
   vars:
     nginx_port: 80
     root_dir: /var/tmp/www
+    dyn_server_name: "This is server {{ ansible_hostname | upper }} based on {{ ansible_distribution | upper }}!"
 
   tasks:
     - name: install nginx

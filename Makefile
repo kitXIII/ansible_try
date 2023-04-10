@@ -4,6 +4,9 @@ ping:
 uptime:
 	ansible all --limit servers -i inventory.ini -m command -a 'uptime'
 
+earn-facts:
+	ansible all -i inventory.ini -m setup
+
 # to check wihtout running
 check-playbook:
 	ansible-playbook --check playbook.yml -i inventory.ini
