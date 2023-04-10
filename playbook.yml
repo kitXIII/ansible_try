@@ -1,4 +1,11 @@
-- hosts: appservers
+- hosts: servers
+
+  vars:
+    users:
+      - jaime
+      - sansa
+      - robert
+    admin_group: admin
 
   tasks:
     - name: Apt update
@@ -47,3 +54,35 @@
         name: nodejs
         state: absent
       tags: uninstall-node
+
+    - name: Add users
+      ansible.builtin.user:
+        name: "{{ item }}"
+        groups: "{{ admin_group }}"
+      with_items: "{{ users }}"
+      tags: install
+
+    - name: Add users ssh keys
+      ansible.posix.authorized_key:
+        user: "{{ item }}"
+        state: present
+        key: "{{ lookup('ansible.builtin.file', './files/id_rsa.pub') }}"
+      with_items: "{{ users }}"
+      tags: install
+
+    - name: Add users to sudoeers and validate
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%{{ admin_group }}'
+        line: '%{{ admin_group }} ALL=(ALL) NOPASSWD: ALL'
+        validate: /usr/sbin/visudo -cf %s
+      tags: install
+
+    - name: Add gitconfig for users
+      ansible.builtin.template:
+        src: templates/gitconfig.j2
+        dest: '/home/{{ item }}/.gitconfig'
+        owner: '{{ item }}'
+      with_items: "{{ users }}"
+      tags: install
